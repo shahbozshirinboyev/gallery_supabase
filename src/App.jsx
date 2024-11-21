@@ -101,14 +101,14 @@ function App() {
   }
   }
   return (
-    <div className="container">
+    <div className="container text-sky-700">
 
       <form className="border p-4 m-2 grid grid-cols-1" onSubmit={uploadImage}>
         <label htmlFor="" className="grid grid-cols-2">
           <span>Upload new IMG:</span>
           <input type="file" className="border" ref={inputRef} onChange={handleNewImg} />
         </label>
-        <button className="border m-2 p-1 w-[120px]" type="submit">{"+ "} Add</button>
+        <button className="border m-2 p-1 w-[120px] transition-all duration-300 rounded-md hover:bg-sky-500 hover:text-white" type="submit">{"+ "} Add</button>
       </form>
 
       <h1 className="container text-center text-[45px] font-bold text-sky-500">
@@ -129,8 +129,7 @@ function App() {
               className="w-full h-[200px] object-cover rounded-md"
             />
             <div className="pt-2">
-              <span>Name: </span> <span>{image.name}</span>
-              <br />
+              <p className="truncate">Name: {image.name}</p>
               <span>Size: </span>{" "}
               <span>{Math.round(image.metadata.size / 1024).toFixed(1)}</span>{" "}
               <span>Kb</span>
