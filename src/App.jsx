@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { supabase } from "./services/supabase";
 
 function App() {
@@ -46,8 +46,52 @@ function App() {
     getImgData();
   }, []);
 
+  const [newImg, setNewImg] = useState([])
+  const inputRef = useRef(null);
+
+  const handleNewImg = (event) => {
+    const selectedImage = event.target.files[0];
+    setNewImg(selectedImage);
+  };
+
+  const uploadImage = async (e) => {
+    e.preventDefault();
+    if (!newImg) return;
+    // Loading Start
+
+    try {
+      const fileName = newImg.name;
+
+      const { data, error } = await supabase.storage
+        .from('gallery')
+        .upload(fileName, newImg);
+
+      if (error) {
+        console.error('Upload error:', error);
+        // Loading Stop
+        return;
+      }
+      // Loading stop
+      getImgData();
+      setNewImg(null);
+      inputRef.current.value = "";
+    }catch(error) {
+      console.error('Error uploading image:', error);
+      // Loading Stop
+    }
+  }
+
   return (
     <div className="container">
+
+      <form className="border p-4 m-2 grid grid-cols-1" onSubmit={uploadImage}>
+        <label htmlFor="" className="grid grid-cols-1">
+          <span>Upload new IMG:</span>
+          <input type="file" className="border" ref={inputRef} onChange={handleNewImg} />
+        </label>
+        <button className="border m-2 p-1 w-[120px]" type="submit">{"+ "} Add</button>
+      </form>
+
       <h1 className="container text-center text-[45px] font-bold text-sky-500">
         Gallery
       </h1>
@@ -71,7 +115,11 @@ function App() {
               <span>{Math.round(image.metadata.size / 1024).toFixed(1)}</span>{" "}
               <span>Kb</span>
             </div>
-            <div className="absolute inset-0 bg-red-700 bg-opacity-50 opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
+            <div className="absolute inset-0 bg-red-700 bg-opacity-50 opacity-0 group-hover:opacity-100 transition-opacity duration-300">
+              <div>
+
+              </div>
+            </div>
           </div>
         ))}
       </div>
