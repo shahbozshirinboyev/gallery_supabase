@@ -13,7 +13,19 @@ function App() {
       if (error) {
         throw error;
       }
-      setAllFileNames(data);
+      console.log(data)
+      const data2 = await Promise.all(
+        data.map(async (file) => { const data = supabase.storage
+            .from("gallery")
+            .getPublicUrl(file.name);
+          if (error) {
+            console.error(`Fayl uchun URL olishda xatolik: ${file.name}`);
+            return null;
+          }
+          console.log(data)
+          // return publicUrl;
+        })
+      );
     } catch (error) {
       console.error("Fayllarni olishda xatolik:", error.message);
     }
@@ -22,18 +34,7 @@ function App() {
   const getGallery = async () => {
     try {
       // Har bir fayl uchun getPublicUrl chaqiradi va barcha promises natijasini kutadi
-      const files = await Promise.all(
-        allFileNames.map(async (file) => {
-          const { publicUrl, error } = supabase.storage
-            .from("gallery")
-            .getPublicUrl(file.name);
-          if (error) {
-            console.error(`Fayl uchun URL olishda xatolik: ${file.name}`);
-            return null;
-          }
-          return publicUrl;
-        })
-      );
+      
 
       // Faqat muvaffaqiyatli URL larni qabul qiladi
       setGallery(files.filter((url) => url !== null));
@@ -46,30 +47,11 @@ function App() {
     getImages();
   }, []);
 
-  useEffect(() => {
-    if (allFileNames.length > 0) {
-      getGallery();
-    }
-  }, [allFileNames]);
 
-  useEffect(() => {
-    console.log("Gallery URLs:", gallery);
-  }, [gallery]);
 
   return (
     <div>
-      <h1>Gallery Files</h1>
-      <ul>
-        {allFileNames.map((file, index) => (
-          <li key={index}>{file.name}</li>
-        ))}
-      </ul>
-      <h2>Gallery Images</h2>
-      <div>
-        {gallery.map((url, index) => (
-          <img key={index} src={url} alt={`Image ${index}`} width={200} />
-        ))}
-      </div>
+      app
     </div>
   );
 }
