@@ -81,11 +81,30 @@ function App() {
     }
   }
 
+  const deleteImg = async(fileName) => {
+    const bucketName = "gallery";
+  try {
+    const { error } = await supabase.storage
+      .from(bucketName)
+      .remove([fileName]);  
+
+    if (error) {
+      throw error;
+    }
+
+    console.log(`${fileName} o'chirildi`);
+
+    
+    getImgData(); 
+  } catch (error) {
+    console.error("Rasmni o'chirishda xato:", error.message);
+  }
+  }
   return (
     <div className="container">
 
       <form className="border p-4 m-2 grid grid-cols-1" onSubmit={uploadImage}>
-        <label htmlFor="" className="grid grid-cols-1">
+        <label htmlFor="" className="grid grid-cols-2">
           <span>Upload new IMG:</span>
           <input type="file" className="border" ref={inputRef} onChange={handleNewImg} />
         </label>
@@ -97,7 +116,8 @@ function App() {
       </h1>
 
       <div className="grid grid-cols-4 gap-4">
-        {gallery.map((image, index) => (
+        { gallery.length !== 0  &&
+        gallery.map((image, index) => (
           <div
             key={index}
             className="relative group w-full overflow-hidden p-2 border rounded-md"
@@ -116,13 +136,16 @@ function App() {
               <span>Kb</span>
             </div>
             <div className="absolute inset-0 bg-red-700 bg-opacity-50 opacity-0 group-hover:opacity-100 transition-opacity duration-300">
-              <div>
-
+              <div className="flex justify-center items-center h-full w-full">
+                  <button className="border rounded-md px-2 py-2" onClick={()=> {deleteImg(image.name)}}>
+                  <i className="bi bi-trash text-[35px] flex justify-center items-center text-white"></i>
+                  </button>
               </div>
             </div>
           </div>
         ))}
       </div>
+      {gallery.length === 0 && <div className="text-center text-[35px]">Empty Gallery</div> }
     </div>
   );
 }
