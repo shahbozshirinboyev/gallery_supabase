@@ -2,56 +2,70 @@ import { useState, useEffect } from "react";
 import { supabase } from "./services/supabase";
 
 function App() {
-  const [allFileNames, setAllFileNames] = useState([]);
+
   const [gallery, setGallery] = useState([]);
 
-  const getImages = async () => {
+  const getImgData = async () => {
+    const bucketName = "gallery";
+    const bucketFolderName = "";
+
     try {
       const { data, error } = await supabase.storage
-        .from("gallery")
-        .list("", { limit: 100, offset: 0 });
+        .from(bucketName)
+        .list(bucketFolderName, { limit: 100, offset: 0 });
+
+        console.log(data)
+
       if (error) {
         throw error;
       }
-      console.log(data)
-      const data2 = await Promise.all(
-        data.map(async (file) => { const data = supabase.storage
-            .from("gallery")
+      const imageUrls = await Promise.all(
+        data.map(async (file) => {
+          const { data: publicData, error } = supabase.storage
+            .from(bucketName)
             .getPublicUrl(file.name);
+
           if (error) {
-            console.error(`Fayl uchun URL olishda xatolik: ${file.name}`);
+            console.error(error.message);
             return null;
           }
-          console.log(data)
-          // return publicUrl;
+          return publicData.publicUrl;
         })
       );
-    } catch (error) {
-      console.error("Fayllarni olishda xatolik:", error.message);
-    }
-  };
 
-  const getGallery = async () => {
-    try {
-      // Har bir fayl uchun getPublicUrl chaqiradi va barcha promises natijasini kutadi
-      
-
-      // Faqat muvaffaqiyatli URL larni qabul qiladi
-      setGallery(files.filter((url) => url !== null));
+      // Faqat muvaffaqiyatli URL larni saqlash
+      setGallery(imageUrls.filter((url) => url !== null));
     } catch (error) {
-      console.error("Galereyani olishda xatolik:", error.message);
+      console.error(error.message);
     }
   };
 
   useEffect(() => {
-    getImages();
+    getImgData();
   }, []);
 
-
-
   return (
-    <div>
-      app
+    <div className="container">
+      <h1 className="container text-center text-[45px] font-bold text-sky-500">
+        Gallery
+      </h1>
+
+      <div className="grid grid-cols-4 gap-4">
+        {gallery.map((url, index) => (
+          <div
+            key={index}
+            className="relative group w-full h-[200px] border overflow-hidden"
+          >
+            {/* Tasvir */}
+            <img
+              src={url}
+              alt={`Image ${index}`}
+              className="w-full h-full object-cover"
+            />
+            <div className="absolute inset-0 bg-red-700 bg-opacity-50 opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
+          </div>
+        ))}
+      </div>
     </div>
   );
 }
