@@ -106,7 +106,7 @@ function App() {
       <form className="border p-4 m-2 grid grid-cols-1" onSubmit={uploadImage}>
         <label htmlFor="" className="grid grid-cols-2">
           <span>Upload new IMG:</span>
-          <input type="file" className="border" ref={inputRef} onChange={handleNewImg} />
+          <input type="file" className="border" required ref={inputRef} onChange={handleNewImg} />
         </label>
         <button className="border m-2 p-1 w-[120px] transition-all duration-300 rounded-md hover:bg-sky-500 hover:text-white" type="submit">{"+ "} Add</button>
       </form>
